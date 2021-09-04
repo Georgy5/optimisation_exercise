@@ -37,7 +37,7 @@ class User < ApplicationRecord
     false
   end
 
-  def already_quoted(job)
+  def already_quoted?(job)
     quote = Quote.where(user_id: self.id, job_id: job.id)
 
     return true if quote.size >= 1
