@@ -6,17 +6,23 @@
 #
 # Let's prepare a secret gist with alternative approach and your thoughts about it!
 
+
+
 class User < ApplicationRecord
+  def check_role(@role, name)
+    @role ||= role_id == Role.find_by(name: name)&.id
+  end
+
   def is_tradesman?
-    @is_tradesman ||= role_id == Role.find_by(name: 'Tradesman')&.id
+    check_role(@is_tradesman, 'Tradesman')
   end
 
   def is_employer?
-    @is_employer ||= role_id == Role.find_by(name: 'Employer')&.id
+    check_role(@is_employer, 'Employer')
   end
 
   def is_collaborator?
-    @is_collaborator ||= role_id == Role.find_by(name: 'Collaborator')&.id
+    check_role(@is_collaborator, 'Collaborator')
   end
 
   def can_access_forum?(args)
