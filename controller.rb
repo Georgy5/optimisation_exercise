@@ -24,14 +24,15 @@ class ContactRequestsController < ApplicationController
                                           purpose: @contact_request_purpose_key)
 
     if @contact_request.save
-      EmailNotification.delay.contact_request_employer(recipient_address: @job_creator.email,
-                                                       tradesman: @tradesman,
-                                                       job: @job,
-                                                       job_url: permalink_job_comparisons_url(@job.token, contact_request: true),
-                                                       contact_request_id: @contact_request.id,
-                                                       job_creator: @job_creator,
-                                                       subject: I18n.t(:Contact_request_for, job_title: @job.title),
-                                                       purpose: ContactRequest::PURPOSE[@contact_request.purpose.to_sym])
+      EmailNotification.delay
+        .contact_request_employer(recipient_address: @job_creator.email,
+                                  tradesman: @tradesman,
+                                  job: @job,
+                                  job_url: permalink_job_comparisons_url(@job.token, contact_request: true),
+                                  contact_request_id: @contact_request.id,
+                                  job_creator: @job_creator,
+                                  subject: I18n.t(:Contact_request_for, job_title: @job.title),
+                                  purpose: ContactRequest::PURPOSE[@contact_request.purpose.to_sym])
       redirect_back fallback_location: job_path(@job)
       flash[:notice] = t(:Contact_request_sent_to_employer)
     else
@@ -45,7 +46,10 @@ module Concerns::V5::ContactRequestParticipateable
   extend ActiveSupport::Concern
 
   included do
-    before_action(:only => :create) { |c| c.requires_premium_membership(job: Job.find_by_id(params[:job_id]), action: Participation::ACTIONS[:contact_request]) if current_user.pricings.current.v5? }
+    before_action(:only => :create) do |c|
+      c.requires_premium_membership(job: Job.find_by_id(params[:job_id]),
+      action: Participation::ACTIONS[:contact_request]) if current_user.pricings.current.v5?
+    end
   end
 
   protected
