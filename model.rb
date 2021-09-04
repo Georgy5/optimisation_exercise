@@ -34,14 +34,14 @@ class User < ApplicationRecord
 
   def creator?(job)
     return true if job.creator == self
-    return false
+    false
   end
 
   def already_quoted(job)
     quote = Quote.where(user_id: self.id, job_id: job.id)
 
     return true if quote.size >= 1
-    return false
+    false
   end
 
   def previous_quote_id(job)
